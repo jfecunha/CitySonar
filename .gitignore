@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 
 data/*.csv
+
+# MacOS
+.DS_Store
