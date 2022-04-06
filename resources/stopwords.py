@@ -220,4 +220,6 @@ terão
 teria
 teríamos
 teriam
+ultima
+ultimas
 """

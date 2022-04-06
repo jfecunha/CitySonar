@@ -133,3 +133,5 @@ data/*.csv
 # MacOS
 .DS_Store
 .vscode
+
+.ipynb_checkpoints/*
