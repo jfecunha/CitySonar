@@ -4,6 +4,7 @@ import logging
 from tqdm import tqdm
 
 import numpy as np
+import pickle
 import yake
 
 
@@ -13,8 +14,9 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     logger.info('Loading data')
-    processed_docs = np.load('data/processed/docs_cleaned.npz', allow_pickle=True)['files']
-
+    #processed_docs = np.load('data/processed/docs_cleaned.npz', allow_pickle=True)['files']
+    with open('data/processed/docs_cleaned.pickle', 'rb') as handle:
+        processed_docs = pickle.load(handle)
 
     language = "pt"
     max_ngram_size = 3
@@ -38,4 +40,7 @@ if __name__ == "__main__":
     for doc in tqdm(processed_docs):
         docs_keywords.append(custom_kw_extractor.extract_keywords(doc))
 
-    np.savez_compressed('../data/processed/docs_keywords', files=docs_keywords)
+    logger.info('Saving')
+    #np.savez_compressed('data/processed/docs_keywords', files=docs_keywords)
+    with open("data/processed/docs_keywords.pickle", "wb") as fp: 
+        pickle.dump(docs_keywords, fp,  protocol=pickle.HIGHEST_PROTOCOL)

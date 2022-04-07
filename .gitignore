@@ -135,3 +135,7 @@ data/*.csv
 .vscode
 
 .ipynb_checkpoints/*
+
+data/processed/*
+
+models/*

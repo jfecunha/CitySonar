@@ -4,6 +4,7 @@ from tqdm import tqdm
 
 import numpy as np
 import pandas as pd
+import pickle
 import spacy
 
 from nlpiper.core import Compose
@@ -44,12 +45,15 @@ if __name__ == "__main__":
     tc = TextCleaner(model=model, stop_words=process_stop_words())
 
     logger.info('Applying cleaning')
-    processed_docs = []
-    for _, val in tqdm(data.iterrows()):
+    processed_docs = []    
+    for _, val in tqdm(data.iloc[0:].iterrows()):
         doc = Document(val['content'].lower())
         doc_p = pipeline(doc)
         doc_p = tc(doc_p.cleaned)
         processed_docs.append(doc_p)
 
-    np.savez_compressed('data/processed/docs_cleaned', files=processed_docs)    
+    logger.info('Saving')
+    with open("data/processed/docs_cleaned.pickle", "wb") as fp: 
+        pickle.dump(processed_docs, fp,  protocol=pickle.HIGHEST_PROTOCOL)
+
     logger.info('Process completed')
