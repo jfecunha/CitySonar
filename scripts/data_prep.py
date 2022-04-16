@@ -1,5 +1,6 @@
 import logging
 
+from typing import List
 from tqdm import tqdm
 
 import numpy as np
@@ -21,6 +22,16 @@ def process_stop_words():
     stop_words = stop_words.cleaned.split(' ')
     stop_words = list(filter(None, stop_words))
     return stop_words
+
+def apply_cleaning(data: pd.DataFrame, column: str) -> List:
+    """Applying cleaning on dataframe."""
+    processed_docs = []    
+    for _, val in tqdm(data.iloc[0:].iterrows()):
+        doc = Document(val[column].lower())
+        doc_p = pipeline(doc)
+        doc_p = tc(doc_p.cleaned)
+        processed_docs.append(doc_p)
+    return processed_docs
 
 
 if __name__ == "__main__":

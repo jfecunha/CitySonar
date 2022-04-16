@@ -14,7 +14,6 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     logger.info('Loading data')
-    #processed_docs = np.load('data/processed/docs_cleaned.npz', allow_pickle=True)['files']
     with open('data/processed/docs_cleaned.pickle', 'rb') as handle:
         processed_docs = pickle.load(handle)
 
@@ -23,7 +22,7 @@ if __name__ == "__main__":
     deduplication_thresold = 0.9
     deduplication_algo = 'seqm'
     windowSize = 1
-    numOfKeywords = 10
+    numOfKeywords = 5
 
     custom_kw_extractor = yake.KeywordExtractor(
         lan=language, 
@@ -41,6 +40,5 @@ if __name__ == "__main__":
         docs_keywords.append(custom_kw_extractor.extract_keywords(doc))
 
     logger.info('Saving')
-    #np.savez_compressed('data/processed/docs_keywords', files=docs_keywords)
     with open("data/processed/docs_keywords.pickle", "wb") as fp: 
         pickle.dump(docs_keywords, fp,  protocol=pickle.HIGHEST_PROTOCOL)

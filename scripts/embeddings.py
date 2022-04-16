@@ -23,4 +23,4 @@ if __name__ == "__main__":
     logger.info('Quality check')
     print(model.wv.most_similar('rei', topn=10))
 
-    model.save("models/word2vec.model")
+    model.save("models/trained/word2vec.model")

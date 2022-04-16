@@ -1,4 +1,5 @@
 """Extract word embeddings from documents."""
+import argparse
 import logging
 
 from tqdm import tqdm
@@ -15,7 +16,7 @@ def extract_embeddings_fom_documents(words: List[str], model: gensim.models.Word
     out_words = []
     for word in words:
         try:
-            emb_words.append(model.wv.get_vector(word))
+            emb_words.append((model.wv.get_vector(word) if args.pre_trained != 1 else model.get_word_vector(word), word))
         except KeyError:
             out_words.append(word)
             continue
@@ -26,6 +27,11 @@ def extract_embeddings_fom_documents(words: List[str], model: gensim.models.Word
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--pre_trained', type=int, help='1 for pre-trained and 0 for custom model.')
+    parser.add_argument('--out_file', type=str, help='filename for output.')
+    args = parser.parse_args()
+
     logger = logging.getLogger("Word-Embeddings-Extraction")
     logging.basicConfig(level=logging.INFO)
 
@@ -35,7 +41,15 @@ if __name__ == "__main__":
         processed_docs = pickle.load(handle)
 
     logger.info('Loading Word2Vec model.')
-    model = gensim.models.Word2Vec.load('models/word2vec.model')
+    if args.pre_trained == 1:
+        #from gensim.models import KeyedVectors
+        logging.info('Using pre-trained model')
+        #model = KeyedVectors.load_word2vec_format('models/pre-trained/cbow_s100.txt')
+        import fasttext
+        model = fasttext.load_model('models/trained/fasttext-sentiment.bin')
+
+    else:
+        model = gensim.models.Word2Vec.load('models/trained/word2vec.model')
 
     logger.info('Applying Word2Vec model.')
     vectorizer = CountVectorizer()
@@ -44,5 +58,5 @@ if __name__ == "__main__":
     embedded_words = extract_embeddings_fom_documents(words=vectorizer.get_feature_names(), model=model)
 
     logger.info('Saving')
-    with open("data/processed/words_embedded.pickle", "wb") as fp: 
+    with open(f"data/processed/{args.out_file}.pickle", "wb") as fp: 
         pickle.dump(embedded_words, fp,  protocol=pickle.HIGHEST_PROTOCOL)
