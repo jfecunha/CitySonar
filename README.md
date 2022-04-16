@@ -15,3 +15,9 @@ Combine sentiment values with the political parties to extract some correlations
 ```
 python -m spacy download pt_core_news_lg
 ```
+
+### SpacyTextBlob
+
+```
+python -m textblob.download_corpora
+```
