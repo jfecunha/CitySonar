@@ -1,5 +1,11 @@
 export PYTHONPATH := .:$(PYTHONPATH)
 
+arquivo-scraper:
+	poetry run python scripts/arquivo_scraper.py
+
+publico-scraper:
+	poetry run python scripts/publico_scraper.py
+
 data-etl:
 	poetry run python scripts/data_prep.py
 
