@@ -2,7 +2,6 @@
 import logging
 import json
 import requests
-import time
 
 from tqdm import tqdm
 
@@ -33,16 +32,18 @@ if __name__ == "__main__":
         "Portalegre",
     ]
 
-    max_items = 2000
-    from_ = 2000
-    to_ = 2023
+    max_items = 10
+    from_ = 2019
+    to_ = 2020
     websites = ['expresso.pt' ,'publico.pt', 'jn.pt', 'jornaldenegocios.pt', 'observador.pt']
     columns=['city', 'title', 'content', 'year', 'tstamp', 'link', 'source']
 
     logging.info('Initializing calls')
     data = pd.DataFrame(columns=columns)
     for city in tqdm(cities):
+        logging.info('On city %s', city)
         for year in range(from_, to_):
+            logging.info('On year %s', year)
             for website in websites:
             
                 link = f"https://arquivo.pt/textsearch?q={city}&siteSearch={website} \
@@ -56,7 +57,7 @@ if __name__ == "__main__":
                 
                     for idx, article in enumerate(payload['response_items']):
 
-                        time.sleep(1)
+                        #time.sleep(1)
             
                         data = pd.concat([data, pd.DataFrame({
                             'city': city, 'title': article['title'], 'content': requests.get(article['linkToExtractedText']).text, 

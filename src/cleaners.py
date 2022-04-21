@@ -20,7 +20,7 @@ class TextCleaner:
 
         tokens = []
         for word in self.model(document):
-            if word.pos_ in ['NOUN', 'ADJ', 'VERB', 'ADV', 'PUNCT']:
+            if word.pos_ in ['PROPN', 'NOUN', 'ADJ', 'VERB', 'ADV', 'PUNCT']:
                 tokens.append(word.text)
         return ' '.join(tokens)
 

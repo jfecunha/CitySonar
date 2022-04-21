@@ -15,7 +15,7 @@ from nlpiper.core import Document
 from src.cleaners import TextCleaner
 from resources.stopwords import WORDS
 
-def process_stop_words():
+def process_stop_words(pipeline):
     """Prepare stop words."""
     stop_words = Document(WORDS)
     stop_words = pipeline(stop_words)
@@ -23,15 +23,12 @@ def process_stop_words():
     stop_words = list(filter(None, stop_words))
     return stop_words
 
-def apply_cleaning(data: pd.DataFrame, column: str) -> List:
+def apply_cleaning(val: str, pipeline, transformer) -> List:
     """Applying cleaning on dataframe."""
-    processed_docs = []    
-    for _, val in tqdm(data.iloc[0:].iterrows()):
-        doc = Document(val[column].lower())
-        doc_p = pipeline(doc)
-        doc_p = tc(doc_p.cleaned)
-        processed_docs.append(doc_p)
-    return processed_docs
+    doc = Document(val.lower())
+    doc_p = pipeline(doc)
+    doc_p = transformer(doc_p.cleaned)
+    return doc_p
 
 
 if __name__ == "__main__":
