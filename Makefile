@@ -6,8 +6,14 @@ arquivo-scraper:
 publico-scraper:
 	poetry run python scripts/publico_scraper.py
 
-data-etl:
+data-cleaning:
 	poetry run python scripts/data_prep.py
+
+train-category-classifier:
+	poetry run python scripts/category_classifier.py
+
+extract-categories:
+	poetry run python scripts/extract_categories.py
 
 train-word2vec:
 	poetry run python scripts/embeddings.py
