@@ -3,6 +3,7 @@ import logging
 import json
 import requests
 import asyncio
+import time
 
 from typing import Dict
 from tqdm import tqdm
@@ -11,20 +12,19 @@ from concurrent.futures import ProcessPoolExecutor
 import pandas as pd
 
 
-def make_request_to_url(url):
+async def make_request_to_url(url):
     request = requests.get(url)
     return request
 
 async def get_request_payload(url):
-    request = make_request_to_url(url)
-    await asyncio.sleep(1)
+    request = await make_request_to_url(url)
+    #await asyncio.sleep(5)
     try:
         payload = json.loads(request.text)
         return payload
     except Exception as e:
         print(request.text)
     
-
 
 def extract_article_metadata(article: Dict, city: str, year: str, source: str):
 
@@ -34,6 +34,8 @@ def extract_article_metadata(article: Dict, city: str, year: str, source: str):
             'city': city, 'title': article['title'], 'content': requests.get(article['linkToExtractedText']).text, 
             'year': year, 'tstamp': article['tstamp'], 'link': article['linkToArchive'], 'source': source
         }
+
+        time.sleep(1)
 
         return article_metadata
 
@@ -48,13 +50,11 @@ def extract_article_metadata(article: Dict, city: str, year: str, source: str):
 
 
 async def get_article_metadata(loop: asyncio, requests: Dict, city: str, year: str, source: str):
-    executor = ProcessPoolExecutor(max_workers=2)
+    executor = ProcessPoolExecutor(max_workers=4)
     article_metadata = await asyncio.gather(*(loop.run_in_executor(executor, extract_article_metadata, article, city, year, source) 
                                   for article in requests))
     return article_metadata
-    #article_metadata = await extract_article_metadata(article, city, year, source)
-    #return article_metadata
-
+   
 
 if __name__ == "__main__":
 
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     ]
 
     max_items = 2000
-    from_ = 2000
+    from_ = 2010
     to_ = 2023
     websites = ['expresso.pt' ,'publico.pt', 'jn.pt', 'jornaldenegocios.pt', 'observador.pt']
     columns=['city', 'title', 'content', 'year', 'tstamp', 'link', 'source']
@@ -111,9 +111,6 @@ if __name__ == "__main__":
                         loop = asyncio.new_event_loop()
                         results.append(loop.run_until_complete(get_article_metadata(loop, payload['response_items'], city, year, source)))
                         loop.close()
-
-                        #results = [asyncio.run(get_article_metadata(article, city, year, source)) for article in payload['response_items']]
-
                 
                 except Exception as e:
                     logging.info('Failed with error: %s', str(e))
