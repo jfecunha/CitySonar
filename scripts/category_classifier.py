@@ -68,6 +68,7 @@ if __name__ == "__main__":
     logger.info('Loading data')
     data_source = pd.read_csv('data/raw/publico_scraper.csv.gz', compression='gzip')
     data_source.dropna(inplace=True)
+    data_source.drop_duplicates(inplace=True)
 
     logger.info('Preprocessing')
     data = data_source[data_source['main_tag'].isin(tags)]
@@ -89,7 +90,7 @@ if __name__ == "__main__":
     tc = TextCleaner(model=model, stop_words=process_stop_words())
 
     data_source_p['body_p'] = [apply_cleaning(doc, tc) for doc in tqdm(data_source_p['body'].to_list())]
-    #data_source_p['title_p'] = [apply_cleaning(doc, tc) for doc in tqdm(data_source_p['title'].to_list())]
+    data_source_p.to_csv('data/processed/publico_docs_cleaned.csv.gz', index=False)
     
     X = np.array(data_source_p['body_p'].to_list())
     Y = np.array(data_source_p['category'].tolist())

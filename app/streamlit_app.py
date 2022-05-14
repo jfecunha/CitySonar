@@ -1,95 +1,178 @@
-import pandas as pd
-import json 
-from geopy.geocoders import Nominatim 
-import numpy as np
+"""Streamlit APP."""
+import ast
+import json
+
+import pandas as pd 
 import folium 
 import streamlit as st
+
 from streamlit_folium import folium_static
+from annotated_text import annotated_text
 
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_agg import RendererAgg
-import seaborn as sns
-
-data_source = pd.read_csv('data/raw/publico_scraper.csv.gz', compression='gzip')
-data_source.dropna(inplace=True)
-GEO_DATA = json.load(open('app/georef-portugal-distrito.geojson'))
-
-def center():
-    address = 'Portugal'
-    geolocator = Nominatim(user_agent="id_explorer")
-    location = geolocator.geocode(address)
-    latitude = location.latitude
-    longitude = location.longitude
-    return latitude, longitude
-
-def threshold(data):
-    threshold_scale = np.linspace(data['N'].min(),
-                              data['N'].max(),
-                              10, dtype=float)
-    threshold_scale = threshold_scale.tolist() 
-    threshold_scale[-1] = threshold_scale[-1]
-    return threshold_scale
-
-def show_maps(data, year, threshold_scale):
-    data['city'] = data['city'].str.upper()
-    data = data[data['year'] == year]
-
-    map_sby = folium.Map(tiles="OpenStreetMap", location=[centers[0], centers[1]], zoom_start=7)
-
-    maps = folium.Choropleth(
-        geo_data = GEO_DATA,
-        data = data[['city', 'N']],
-        columns=['city', 'N'],
-        key_on='feature.properties.dis_name_upper',
-        threshold_scale=threshold_scale,
-        fill_color='YlOrRd', 
-        fill_opacity=0.3, 
-        line_opacity=0.2,
-        legend_name='N',
-        highlight=True,
-        reset=True,
-        overlay=True,
-        ).add_to(map_sby)
-
-    folium.LayerControl().add_to(map_sby)
-    # maps.geojson.add_child(folium.features.GeoJsonTooltip(fields=['dis_name_upper', 'N'],
-    #                                                      aliases=['City: ', 'Count'],
-    #                                                      labels=True))                                                       
-    folium_static(map_sby)
-
-def plot_stats(data, year):
-    fig = Figure()
-    ax = fig.subplots()
-    df = data[data.year==year]
-    sns.barplot(x=df['city'],
-                y=df['N'], color='goldenrod', ax=ax)
-    ax.set_xlabel('Year')
-    ax.set_ylabel('Books Read')
-    ax.tick_params(axis='x', rotation=90)
-    st.pyplot(fig)
-
-sns.set_style('darkgrid')
-centers = center()
-
-select_data = st.sidebar.radio(
-    "Categorias",
-    ("Crime", "Incendios")
+from utils import (
+    CATEGORIES,
+    CITIES,
+    build_keyword_annotations,
+    process_geodata,
+    center,
+    threshold,
+    draw_map,
+    plot_articles,
+    plot_political_parties
 )
+# Publico Source
+publico_articles = pd.read_csv('data/processed/publico_docs_cleaned_w_keywords.csv.gz', compression='gzip')
 
-st.header('CitySonar')
+# Arquivo Source
+articles_general = pd.read_csv('data/dashboard/articles_general.csv')
+subset_categories = pd.read_csv('data/dashboard/subset_categories.csv')
+subset_articles_general = pd.read_csv('data/dashboard/subset_articles_general.csv')
+subset_articles_categories = pd.read_csv('data/dashboard/subset_articles_categories.csv')
 
-# for idx in range(31):
-#     data_geo['features'][idx]['properties']['Total_Pop'] = int(data['Total Population'][idx])
-#     data_geo['features'][idx]['properties']['Male_Pop'] = int(data['Male Population'][idx])
-#     data_geo['features'][idx]['properties']['Female_Pop'] = int(data['Female Population'][idx])
-#     data_geo['features'][idx]['properties']['Area_Region'] = float(data['Areas Region(km squared)'][idx])
+# Wikipedia
+data_political_parties = pd.read_csv('data/scraping_political_parties.csv.gz', compression='gzip')
+geo_data = json.load(open('app/georef-portugal-distrito.geojson'))
 
-year = st.slider('Ano', 2015, 2021, (2015, 2021))
 
-subset = data_source.groupby(['city', 'year']).size().reset_index(name='N')
+if __name__ == "__main__":
 
-st.subheader('Numero de noticias por região')
-show_maps(subset, year[0], threshold(subset))
+    st.set_page_config(page_title='CitySonar',  layout='wide', page_icon=':city:')
 
-st.subheader('Distribuição de artigos por jornais')
-plot_stats(subset, year[0])
+    ### Side buttons
+    st.sidebar.image("images/citySonar.png", use_column_width=True)
+    
+    city = st.sidebar.selectbox("Escolha a cidade", CITIES) 
+
+    category = st.sidebar.radio(
+        "Categorias",
+        CATEGORIES
+    )
+
+    ### Main page
+
+    ## Page 1
+    if city == 'Geral':
+        st.header('Métricas')
+        m1, m2, m3, m4, m5 = st.columns((1,1,1,1,1))
+          
+        m1.write('')
+        m2.metric(label ='Número total de noticias extraídas',value = articles_general.N.sum())
+        m3.metric(label ='Número de jornais usados',value = 4)
+        m4.metric(label = 'Número de cidades analisadas',value = len(CITIES)-1)
+        m1.write('')
+
+        st.header('Visão agregada de todas as cidades')
+        st.subheader('Número de noticias por região')
+        year = st.slider('Ano', 2014, 2021, (2014, 2021))
+        centers = center('Portugal')
+
+        if category == 'Geral':
+            st.subheader(f"Categoria: {category}")
+
+            geo_data_p = process_geodata(geo_data, articles_general, year[0])
+            articles_general['city'] = articles_general['city'].str.upper()
+            query = articles_general[(articles_general['year'] == year[0])][['city', 'N']]
+            draw_map(query, centers, geo_data_p)
+
+            st.subheader('Distribuição de fontes dos artigos para todas as categorias')
+            query = subset_articles_general[subset_articles_general.year == year[0]]
+            query = query.groupby(['source'])['N'].sum().reset_index(name='N')
+            plot_articles(query)
+        else:
+            st.subheader(f"Categoria: {category}")
+
+            geo_data_p = process_geodata(geo_data, subset_categories, year[0], category)
+            subset_categories['city'] = subset_categories['city'].str.upper()
+            query = subset_categories[(subset_categories['year'] == year[0]) & (subset_categories['category'] == category)][['city', 'N']]
+            draw_map(query, centers, geo_data_p)
+
+            st.subheader(f'Fontes dos artigos extraidos para a categoria selectionada')
+            query = subset_articles_categories[
+                (subset_articles_categories.category == category) &
+                (subset_articles_categories.year == year[0])
+                ]
+            query = query.groupby(['source'])['N'].sum().reset_index(name='N')
+            plot_articles(query)
+    ## Page 2
+    else:
+        st.subheader(f'{city}')
+        year = st.slider('Ano', 2014, 2021, (2014, 2021))
+        centers = center(city)
+        subset_categories['city'] = subset_categories['city'].str.upper()
+        query = subset_categories[(subset_categories['year'] == year[0]) & (subset_categories['category'] == category)][['city', 'N']]
+
+        st.subheader(f"Categoria: {category}")
+        map_sby = folium.Map(tiles="OpenStreetMap", location=[centers[0], centers[1]], zoom_start=8)
+        geo_data_slice = [c for c in geo_data['features'] if c['properties']['dis_name'] == city]
+        geo_data['features'] = geo_data_slice
+        
+        maps = folium.Choropleth(
+            geo_data = geo_data,
+            data = query[['city', 'N']],
+            columns=['city', 'N'],
+            key_on='feature.properties.dis_name_upper',
+            threshold_scale=threshold(query),
+            fill_color='YlOrRd', 
+            fill_opacity=0.7, 
+            line_opacity=0.2,
+            legend_name='N',
+            highlight=True,
+            reset=True,
+            overlay=True,
+            ).add_to(map_sby)
+        folium_static(map_sby)
+
+        if category == 'Geral':
+            st.subheader(f'Fontes dos artigos extraídos para todas as categorias')
+            query = subset_articles_general[
+                (subset_articles_general.year == year[0]) & (subset_articles_general.city == city)]
+            plot_articles(query)
+        else:
+
+            articles = publico_articles[
+            (publico_articles.category == category) & 
+            (publico_articles.city == city) &
+            (publico_articles.year == year[0])
+            ]
+            st.subheader(f'Notícias')
+            #articles_query = articles.sample(n=10 if len(articles) > 10 else len(articles), replace=False)
+            n = 10 if len(articles) > 10 else len(articles)
+            articles_query = articles.iloc[0:n]
+
+            #st.dataframe(articles_query[['title', 'category', 'year', 'keywords']])
+
+            st.selectbox("Escolha a notícia", tuple(articles_query.title.tolist()), key='news')#, on_change=form_callback)
+            title = st.session_state.news
+            st.markdown('**Palavras-Chave**')
+            try:
+                keywords = ast.literal_eval(articles_query[articles_query.title==title].keywords.item())
+                keywords = [k.split(' ') for k in keywords]
+                keywords = [item for sublist in keywords for item in sublist]
+                articles_to_display = articles_query[articles_query.title==title].body.item()
+                annotated_text(*build_keyword_annotations(articles_to_display, keywords))
+                
+            except ValueError:
+                st.markdown('Não há dados disponíveis.')
+                articles_to_display = []
+
+            st.write('')    
+            st.subheader(f'Fontes dos artigos extraídos para a categoria selecionada')
+            query = subset_articles_categories[
+                (subset_articles_categories.category == category) & 
+                (subset_articles_categories.city == city) &
+                (subset_articles_categories.year == year[0])
+                ]
+            if not articles_to_display:    
+                plot_articles(articles_to_display)
+            else:
+                plot_articles(query)
+
+        st.subheader(f'Composição partidária da cidade')
+        plot_political_parties(data_political_parties, year[0], city)
+        st.markdown(f'Dados extraidos de: https://pt.wikipedia.org/wiki/Elei%C3%A7%C3%B5es_legislativas_portuguesas_de_{year[0]}')
+        st.markdown('**Portugal à frente**: Coligação eleitoral entre PPD/PSD e CDS-PP')
+        st.markdown('**Coligação Democrática Unitária**: Coligação eleitoral entre PCP e PEV')
+
+
+
+

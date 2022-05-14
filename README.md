@@ -1,11 +1,10 @@
-# SmartArchive
+# CitySonar
 
-Analyze sentiment on different topics like life quality, economy, and pollution in Portugal district cities over the years.
-Combine sentiment values with the political parties to extract some correlations.
+Geolocation tool to analyze cities articles categories over the years.
 
 **Possible approach:**
 
-![alt text](images/SmartArchive.png)
+![alt text](images/citySonar.png)
 
 
 ## Language models
@@ -16,8 +15,4 @@ Combine sentiment values with the political parties to extract some correlations
 python -m spacy download pt_core_news_lg
 ```
 
-### SpacyTextBlob
-
-```
-python -m textblob.download_corpora
-```
+## TO DO

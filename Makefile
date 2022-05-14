@@ -15,6 +15,12 @@ train-category-classifier:
 extract-categories:
 	poetry run python scripts/extract_categories.py
 
+extract-keywords-publico:
+	poetry run python scripts/extract_publico_keywords.py
+
+run-app:
+	poetry run python streamlit run app/streamlit_app.py
+
 train-word2vec:
 	poetry run python scripts/embeddings.py
 

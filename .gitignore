@@ -140,5 +140,5 @@ data/processed/*
 
 models/*
 
-data/external_corpus/*
+data/*
 selenium/*
