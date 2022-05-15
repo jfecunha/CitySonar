@@ -12,7 +12,7 @@ data-cleaning:
 train-category-classifier:
 	poetry run python scripts/category_classifier.py
 
-extract-categories:
+extract-arquivo-categories:
 	poetry run python scripts/extract_categories.py
 
 extract-keywords-publico:
@@ -20,24 +20,3 @@ extract-keywords-publico:
 
 run-app:
 	poetry run python streamlit run app/streamlit_app.py
-
-train-word2vec:
-	poetry run python scripts/embeddings.py
-
-extract-yake-keywords:
-	poetry run python scripts/extract_keywords.py
-
-extract-word-embeddings:
-	poetry run python scripts/extract_word_embeddings.py \
-	--pre_trained 0 \
-	--out_file words_embedded
-
-train-concept-model:
-	poetry run python scripts/clustering.py
-
-train-sentiment-classifier:
-	poetry run python scripts/sentiment_classifier.py
-
-extract-keyword-sentiment:
-	poetry run python scripts/extract_keywords_sentiment.py
-
