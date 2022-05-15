@@ -43,11 +43,26 @@ The application has two different views. One that is related to the general over
 | Spacy | Pos-tagging | **pt_core_news_lg** model|
 | Yake | Keyword extraction |  |
 
+## Tasks
+
+| Execute            |     |
+|---                 | --- |
+| make arquivo-scraper  | Pipeline for Arquivo data collection|
+| make publico-scraper  | Pipeline for Publico data collection|
+| make data-cleaning  | Pipeline for Arquivo data cleaning|
+| make train-category-classifier | Train fasttext category classifier|
+| make extract-arquivo-categories | Pipeline to extract categories from Arquivo data|
+| make extract-keywords-publico | Pipeline to extract keywords from text using YAKE|
+| make run-app | Runs Streamlit Geolocation app|
+
+---
+
 ## TO DO
 
-- Make streamlit app available at the public endpoint (Just local at the moment).
-- Display Arquivo articles on streamlit app with keywords. Currently, is just being showed the scrapped data directly from Público.
+- Make streamlit app available at the public endpoint (Just runs locally at the moment).
+- Display Arquivo articles on streamlit app with keywords. Currently, is just being shown the scrapped data directly from Público.
 
 ## Resources
 
 - Video: https://drive.google.com/file/d/1D4pTse5fQ9K25i8y5y6MceYmL4zkCESu/view?usp=sharing
+- Documentation: https://drive.google.com/file/d/1sBn6lIJ7dxjy4ysm_hc91IYgADjRWunq/view?usp=sharing

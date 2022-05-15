@@ -15,7 +15,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from joblib import Parallel, delayed 
 
-PATH = '/home/joao/Projects/SmartArchive/selenium/chromedriver'
+PATH = '../Projects/SmartArchive/selenium/chromedriver'
 
 
 def extract_info_from_url(url, city, year):

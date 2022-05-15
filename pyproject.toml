@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "Smart Archive"
+name = "CitySonar"
 version = "0.0.1"
 description = "Code implemented on the contest Prémio Arquivo.pt 2022"
 authors = ["Joao Cunha"]
@@ -20,7 +20,6 @@ yake = "^0.4.8"
 spacy = "^3.2.3"
 typer = "0.3.2" # BUG on spacy
 nlpiper = "^0.2.1"
-#pyLDAvis = "^3.3.1"
 numpy = "^1.22.3"
 scipy = "^1.8.0"
 pybind11 = "^2.9.2"
