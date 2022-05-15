@@ -132,3 +132,13 @@ data/*.csv
 
 # MacOS
 .DS_Store
+.vscode
+
+.ipynb_checkpoints/*
+
+data/processed/*
+
+models/*
+
+data/*
+selenium/*

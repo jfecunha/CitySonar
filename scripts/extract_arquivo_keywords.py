@@ -1,0 +1,1 @@
+"""Extract Arquivo articles keywords."""
