@@ -66,3 +66,4 @@ The application has two different views. One that is related to the general over
 
 - Video: https://drive.google.com/file/d/1D4pTse5fQ9K25i8y5y6MceYmL4zkCESu/view?usp=sharing
 - Documentation: https://drive.google.com/file/d/1sBn6lIJ7dxjy4ysm_hc91IYgADjRWunq/view?usp=sharing
+- Data: https://drive.google.com/drive/folders/188z6GLlUZrU0qHKwXViGmbEKH8NVtqaj?usp=sharing
