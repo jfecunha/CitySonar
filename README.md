@@ -24,14 +24,30 @@ The application has two different views. One that is related to the general over
 
 ![alt text](images/app-general.png)
 
+![alt text](images/app-general-bottom.png)
+
+![alt text](images/app-general-2.png)
+
 ### City overview
 
+![alt text](images/app-city-level.png)
+
+![alt text](images/app-city-level-1.png)
+
+![alt text](images/app-city-level-2.png)
 
 ## Language models
 
 | Model | Usage | Obs |
 | --- | --- | --- |
-| Spacy | Pos-tagging | pt_core_news_lg |
+| Spacy | Pos-tagging | **pt_core_news_lg** model|
 | Yake | Keyword extraction |  |
 
 ## TO DO
+
+- Make streamlit app available at the public endpoint (Just local at the moment).
+- Display Arquivo articles on streamlit app with keywords. Currently, is just being showed the scrapped data directly from Público.
+
+## Resources
+
+- Video: https://drive.google.com/file/d/1D4pTse5fQ9K25i8y5y6MceYmL4zkCESu/view?usp=sharing
