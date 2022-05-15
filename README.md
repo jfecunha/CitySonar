@@ -1,13 +1,16 @@
 # CitySonar
 
-Geolocation tool to analyze cities articles categories over the years.
+<p align="center">
+  <img src="images/citySonar.png"/>
+</p>
 
-**Possible approach:**
+Geolocation tool to analyze cities newspapers articles categories over the years.
 
-![alt text](images/citySonar.png)
+![alt text](images/app.png)
 
 
 ## Language models
+
 
 ### Spacy
 
